@@ -1,0 +1,80 @@
+project_name: cloudzero-client-go
+
+env:
+  - GO111MODULE=on
+
+before:
+  hooks:
+    - go mod download
+
+# Libraries with no bins, enable this
+# otherwise remove build and use a 'builds' section
+build:
+  skip: true
+
+#builds:
+#  -
+#    id: "default"
+#    goos:
+#      - linux
+#    goarch:
+#      - amd64
+#    ignore:
+#      - goos: linux
+#        goarch: amd64
+#  -
+#    id: jjttech
+#    dir: cmd/jjttech
+#    binary: jjttech
+#    env:
+#      - CGO_ENABLED=0
+#    goos:
+#      - linux
+#      - darwin
+#      - windows
+#    goarch:
+#      - amd64
+#    ldflags:
+#      - -s -w -X main.version={{.Version}} -X main.AppName={{.Binary}}
+#        -X github.com/jjttech/cloudzero-client-go/internal/version.Version={{.Version}}
+
+release:
+  # Mark as a pre-release for now
+  prerelease: true
+  name_template: "{{.ProjectName}} v{{.Version}}"
+
+#archives:
+#  -
+#    id: "default"
+#    builds:
+#      - jjttech
+#    replacements:
+#      darwin: Darwin
+#      linux: Linux
+#      windows: Windows
+#      386: i386
+#      amd64: x86_64
+#    format_overrides:
+#      - goos: windows
+#        format: zip
+#    files:
+#      - CHANGELOG.md
+#      - LICENSE
+#      - README.md
+#
+#dockers:
+#  -
+#    dockerfile: build/package/Dockerfile
+#    image_templates:
+#      - 'jjttech/cloudzero-client-go:{{ .Tag }}'
+#      - 'jjttech/cloudzero-client-go:v{{ .Major }}.{{ .Minor }}'
+#      - 'jjttech/cloudzero-client-go:latest'
+#    binaries:
+#      - jjttech
+#    build_flag_templates:
+#      - "--pull"
+#      - "--label=repository=http://github.com/jjttech/cloudzero-client-go"
+
+# Already using git-chglog
+changelog:
+  skip: true
