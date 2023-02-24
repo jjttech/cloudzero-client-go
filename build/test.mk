@@ -18,8 +18,7 @@ PROJECT_MODULE ?= $(shell $(GO) list -m)
 
 LDFLAGS_UNIT ?= '-X $(PROJECT_MODULE)/internal/version.GitTag=$(PROJECT_VER_TAGGED)'
 
-test: test-only
-test-only: test-unit test-integration
+test: test-unit test-integration coverage
 
 test-unit: tools
 	@echo "=== $(PROJECT_NAME) === [ test-unit        ]: running unit tests..."
