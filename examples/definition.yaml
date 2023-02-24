@@ -1,0 +1,519 @@
+#
+# Default definitions from the CloudZero documentation
+#   https://docs.cloudzero.com/docs/default-dimension-definitions
+#
+Dimensions:
+  Category:
+    Name: Service Category
+    Child: Service
+    DefaultValue: Other
+    Source: Service
+    Rules:
+      - Type: Group
+        Name: Marketplace
+        Conditions:
+          - Source: CloudProvider
+            Equals: AWS Marketplace
+      - Type: Group
+        Name: Networking
+        Conditions:
+          - Equals:
+              - AmazonRoute53
+              - AWSELB
+              - AmazonVPC
+              - AWSDirectConnect
+              - AWSGlobalAccelerator
+              - AWSTransfer
+              - awswaf
+          - Contains: Firewall
+          - Source: UsageFamily
+            Equals:
+              - Data Transfer
+              - NAT Gateway
+          - Source: Resource
+            Transforms:
+              - Type: Normalize
+            Contains:
+              - -vpc-flow-log
+              - flow-log
+              - flowlog
+              - vpc-flow
+              - -nat-gateway
+              - -vpc-endpoint
+              - -transit-gateway
+              - -elasticip
+              - -client-vpn
+      - Type: Group
+        Name: Database
+        Conditions:
+          - Equals:
+              - AmazonDynamoDB
+              - AmazonDAX
+              - AmazonRDS
+              - AmazonElastiCache
+              - AmazonRedshift
+              - AWSDatabaseMigrationSvc
+              - AmazonNeptune
+              - AmazonMemoryDB
+          - Source: CloudProvider
+            Equals: Snowflake
+      - Type: Group
+        Name: End User Computing
+        Conditions:
+          - Equals: AmazonWorkspaces
+      - Type: Group
+        Name: Security
+        Conditions:
+          - Equals:
+              - AmazonGuardDuty
+              - AmazonInspector
+              - AWSSecurityHub
+              - AWSShield
+              - AmazonMacie
+              - awskms
+              - AWSCertificateManager
+              - AWSSecretsManager
+      - Type: Group
+        Name: Content Delivery
+        Conditions:
+          - Equals:
+              - AmazonCloudFront
+              - AmazonApiGateway
+              - AmazonSES
+      - Type: Group
+        Name: Internet of Things
+        Conditions:
+          - Equals: AWSIoT
+          - BeginsWith: IoT
+      - Type: Group
+        Name: Analytics
+        Conditions:
+          - Equals:
+              - ElasticMapReduce
+              - AWSGlue
+              - AmazonAthena
+              - AmazonES
+              - AmazonMSK
+              - AmazonKinesis
+              - AmazonKinesisAnalytics
+              - AmazonKinesisFirehose
+              - AmazonKinesisVideo
+              - AmazonQuickSight
+      - Type: Group
+        Name: Application Integration
+        Conditions:
+          - Equals:
+              - AWSQueueService
+              - AmazonSNS
+              - AmazonMQ
+              - AmazonStates
+              - AWSEvents
+      - Type: Group
+        Name: Storage
+        Conditions:
+          - Equals:
+              - AmazonS3
+              - AmazonS3GlacierDeepArchive
+              - AmazonDocDB
+              - AmazonGlacier
+              - AmazonEFS
+              - AmazonFSx
+          - And:
+              - Equals: AmazonEC2
+              - Source: UsageFamily
+                Equals:
+                  - Storage
+                  - System Operation
+                  - Storage Snapshot
+      - Type: Group
+        Name: Machine Learning
+        Conditions:
+          - Equals:
+              - AmazonML
+              - comprehend
+              - AmazonLex
+              - AmazonPolly
+              - AmazonRekognition
+              - AmazonSageMaker
+              - transcribe
+              - translate
+              - AmazonKendra
+      - Type: Group
+        Name: Cloud Management
+        Conditions:
+          - Equals:
+              - AWSConfig
+              - AWSXRay
+              - AWSCloudTrail
+              - AmazonCloudWatch
+      - Type: Group
+        Name: Compute
+        Conditions:
+          - Equals:
+              - AmazonEC2
+              - AWSLambda
+              - AmazonECR
+              - AmazonLightsail
+              - AmazonECS
+              - AmazonEKS
+  Elasticity:
+    Name: Elasticity
+    Child: Service
+    DefaultValue: Fixed Costs
+    Source: Service
+    Rules:
+      - Type: Group
+        Name: Storage
+        Conditions:
+          - Source: CZ:Defined:Category
+            Equals: Storage
+      - Type: Group
+        Name: Variable Costs
+        Conditions:
+          - Source: CloudProvider
+            Equals: Snowflake
+          - Source: CZ:Defined:Category
+            Equals:
+              - Networking
+              - Content Delivery
+              - Machine Learning
+              - Appliation Integration
+              - Analytics
+              - Internet of Things
+              - Cloud Management
+              - Security
+          - Source: Service
+            Equals:
+              - AWSLambda
+              - AmazonEKS
+              - AmazonECS
+              - AmazonECR
+          - Source: UsageFamily
+            Equals:
+              - Data Transfer
+              - API Request
+              - API Calls
+          - And:
+              - Equals: AmazonEC2
+              - Source: UsageFamily
+                Equals:
+                  - Spot Instance
+                  - NAT Gateway
+          - And:
+              - Equals: AmazonRDS
+              - Source: UsageFamily
+                Equals: System Operation
+          - And:
+              - Equals: AmazonDynamoDB
+              - Source: UsageFamily
+                Equals: Amazon DynamoDB PayPerRequest Throughput
+          - And:
+              - Equals: AWSCloudTrail
+              - Source: UsageFamily
+                Equals: Management Tools - AWS CloudTrail Data Events Recorded
+  InstanceType:
+    Name: Instance Type
+    DefaultValue: N/A
+    Rules:
+      - Type: GroupBy
+        Source: UsageType
+        Transforms:
+          - Type: Split
+            Delimiter: ':'
+            Index: 2
+        Conditions:
+          - And:
+              - Source: Service
+                Equals: AmazonEC2
+              - Source: UsageFamily
+                Equals:
+                  - Compute Instance
+                  - Spot Instance
+          - And:
+              - Source: Service
+                Equals: AmazonES
+              - Source: UsageFamily
+                Equals: Elastic Search Instance
+          - And:
+              - Source: Service
+                Equals: ElasticMapReduce
+              - Source: UsageFamily
+                Equals: Elastic Map Reduce Instance
+          - And:
+              - Source: Service
+                Equals: AmazonRDS
+              - Source: UsageFamily
+                Equals: Database Instance
+          - And:
+              - Source: Service
+                Equals: AmazonElastiCache
+              - Source: UsageFamily
+                Equals: Cache Instance
+          - And:
+              - Source: Service
+                Equals: AmazonSageMaker
+              - Source: UsageFamily
+                Equals: ML Instance
+          - And:
+              - Source: Service
+                Equals: AmazonMSK
+              - Source: UsageFamily
+                Equals: Managed Streaming for Apache Kafka (MSK)
+          - Source: UsageType
+            Contains: HeavyUsage
+  NetworkingCategory:
+    Name: Networking Category
+    Child: CZ:Defined:NetworkingSubCategory
+    DefaultValue: N/A
+    Source: Service
+  NetworkingSubCategory:
+    Name: Networking Sub-Category
+    DefaultValue: N/A
+    Source: UsageFamily
+    Rules:
+      - Type: GroupBy
+        Source: TransferType
+        Conditions:
+          - And:
+              - Source: Service
+                Equals: AmazonCloudfront
+              - Equals: Data Transfer
+      - Type: Group
+        Name: S3 Inbound
+        Conditions:
+          - And:
+              - Source: Service
+                Equals: AmazonS3
+              - Equals: Data Transfer
+              - Source: UsageType
+                Contains: DataTransfer-In-Bytes
+      - Type: Group
+        Name: S3 Outbound
+        Conditions:
+          - And:
+              - Source: Service
+                Equals: AmazonS3
+              - Equals: Data Transfer
+              - Source: UsageType
+                Contains: DataTransfer-Out-Bytes
+      - Type: Group
+        Name: IntraRegion - AZ to AZ
+        Conditions:
+          - And:
+              - Equals: Data Transfer
+              - Source: UsageType
+                Contains: DataTransfer-Regional-Bytes
+      - Type: Group
+        Name: AWS Inbound
+        Conditions:
+          - And:
+              - Equals: Data Transfer
+              - Source: UsageType
+                Contains: DataTransfer-In-Bytes
+      - Type: Group
+        Name: AWS Outbound
+        Conditions:
+          - And:
+              - Equals: Data Transfer
+              - Source: UsageType
+                Contains: DataTransfer-Out-Bytes
+      - Type: Group
+        Name: InterRegion Inbound
+        Conditions:
+          - And:
+              - Equals: Data Transfer
+              - Source: UsageType
+                Contains: AWS-In-Bytes
+      - Type: Group
+        Name: InterRegion Outbound
+        Conditions:
+          - And:
+              - Equals: Data Transfer
+              - Source: UsageType
+                Contains: AWS-Out-Bytes
+      - Type: Group
+        Name: Data Transfer
+        Conditions:
+          - Equals: Data Transfer
+      - Type: Group
+        Name: NAT Gateway (Bytes)
+        Conditions:
+          - And:
+              - Equals: NAT Gateway
+              - Source: UsageType
+                Contains: Bytes
+      - Type: Group
+        Name: NAT Gateway (Hours)
+        Conditions:
+          - And:
+              - Equals: NAT Gateway
+              - Source: UsageType
+                Contains: Hours
+      - Type: Group
+        Name: NAT Gateway (Other)
+        Conditions:
+          - Equals: NAT Gateway
+      - Type: Group
+        Name: VPC Endpoint (Bytes)
+        Conditions:
+          - And:
+              - Equals: VpcEndpoint
+              - Source: UsageType
+                Contains: Bytes
+      - Type: Group
+        Name: VPC Endpoint (Hours)
+        Conditions:
+          - And:
+              - Equals: VpcEndpoint
+              - Source: UsageType
+                Contains: Hours
+      - Type: Group
+        Name: VPC Endpoint (Other)
+        Conditions:
+          - Equals: VpcEndpoint
+      - Type: Group
+        Name: Transit Gateway (Bytes)
+        Conditions:
+          - And:
+              - Source: UsageType
+                Contains: TransitGateway
+              - Source: UsageType
+                Contains: Bytes
+      - Type: Group
+        Name: Transit Gateway (Hours)
+        Conditions:
+          - And:
+              - Source: UsageType
+                Contains: TransitGateway
+              - Source: UsageType
+                Contains: Hours
+      - Type: Group
+        Name: Transit Gateway (Other)
+        Conditions:
+          - Source: UsageType
+            Contains: TransitGateway
+      - Type: Group
+        Name: Client VPN (Bytes)
+        Conditions:
+          - And:
+              - Source: UsageType
+                Contains: ClientVPN
+              - Source: UsageType
+                Contains: Bytes
+      - Type: Group
+        Name: Client VPN (Hours)
+        Conditions:
+          - And:
+              - Source: UsageType
+                Contains: ClientVPN
+              - Source: UsageType
+                Contains: Hours
+      - Type: Group
+        Name: Client VPN (Other)
+        Conditions:
+          - Source: UsageType
+            Contains: ClientVPN
+      - Type: GroupBy
+        Source: UsageFamily
+        Conditions:
+          - Source: Service
+            Equals:
+              - AmazonVPC
+              - AWSDirectConnect
+              - AWSELB
+  PaymentOption:
+    Name: Payment Option
+    Child: Service
+    DefaultValue: On-Demand
+    Rules:
+      - Type: Group
+        Name: Reservation
+        Conditions:
+          - Source: LineItemType
+            Equals: DiscountedUsage
+      - Type: Group
+        Name: Savings Plan
+        Conditions:
+          - Source: LineItemType
+            Equals:
+              - SavingsPlanCoveredUsage
+              - SavingsPlanNegation
+              - SavingsPlanRecurringFee
+      - Type: Group
+        Name: Fee
+        Conditions:
+          - Source: LineItemType
+            Equals: Fee
+      - Type: Group
+        Name: Tax
+        Conditions:
+          - Source: LineItemType
+            Equals: Tax
+      - Type: Group
+        Name: Discount
+        Conditions:
+          - Source: LineItemType
+            Equals:
+              - EdpDiscount
+              - PrivateRateDiscount
+              - Credit
+              - Refund
+              - BundledDiscount
+      - Type: Group
+        Name: Spot
+        Conditions:
+          - Source: UsageFamily
+            Contains: Spot Instance
+          - Source: UsageType
+            Contains: SpotUsage
+      - Type: Group
+        Name: Provisioned
+        Conditions:
+          - Source: UsageFamily
+            Equals: Provisioned IOPS
+          - Source: UsageType
+            Transforms:
+              - Type: Lower
+            Contains:
+              - piops
+              - p-iops
+  ResourceNameOnly:
+    Name: Resource Name
+    Hide: true
+    DefaultValue: Indirect Spend
+    Rules:
+      - Type: GroupBy
+        Source: Resource
+        Transforms:
+          - Type: Split
+            Delimiter: ':'
+            Index: 7
+        Conditions:
+          - Not:
+              - Source: Resource
+                Contains: ':service-usage:'
+  ServiceDisplay:
+    Name: Service - Display
+    Hide: true
+    Rules:
+      - Type: GroupBy
+        Source: Service
+        Transforms:
+          - Type: Split
+            Delimiter: Amazon
+            Index: 2
+        Conditions:
+          - Source: Service
+            BeginsWith: Amazon
+      - Type: GroupBy
+        Source: Service
+        Transforms:
+          - Type: Split
+            Delimiter: AWS
+            Index: 2
+        Conditions:
+          - Source: Service
+            BeginsWith: AWS
+      # Fallback
+      - Type: GroupBy
+        Source: Service
