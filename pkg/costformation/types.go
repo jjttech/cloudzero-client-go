@@ -9,8 +9,10 @@ type DefinitionFile struct {
 	Dimensions map[string]Dimension `yaml:"Dimensions,omitempty"`
 
 	// Attributes of the file, not content, explicitly ignore on yaml rendering
-	Version     string `yaml:"-"`
-	HeadComment string `yaml:"-"`
+	Version       string `yaml:"-"` // Version returned via the API
+	LastUpdated   string `yaml:"-"` // LastUpdated timestamp return via the API
+	LastUpdatedBy string `yaml:"-"` // LastUpdatedBy info returned via the API
+	HeadComment   string `yaml:"-"` // HeadComment is inserted at the top of the file
 }
 
 // Dimension is a custom configuration for grouping data
@@ -128,4 +130,56 @@ type Condition struct {
 	Contains   utils.StringSlice `yaml:"Contains,omitempty"`
 	HasValue   utils.StringSlice `yaml:"HasValue,omitempty"`
 	BeginsWith utils.StringSlice `yaml:"BeginsWith,omitempty"`
+}
+
+/*
+ * API Types
+ */
+type DefinitionVersion struct {
+	Version       string `json:"version"`                   // Version unique string identifying this version
+	LastUpdated   string `json:"last_updated,omitempty"`    // LastUpdated UTC timestamp for the last update of this entity
+	LastUpdatedBy string `json:"last_updated_by,omitempty"` // LastUpdatedBy email, username, or api key that created this entity (optional)
+	URI           string `json:"uri,omitempty"`             // Only set when fetching a version
+}
+
+type cursor struct {
+	Next        string `json:"next_cursor,omitempty"`
+	Previous    string `json:"previous_cursor,omitempty"`
+	HasNext     bool   `json:"has_next,omitempty"`
+	HasPrevious bool   `json:"has_previous,omitempty"`
+}
+
+type pagination struct {
+	PageCount  int    `json:"page_count,omitempty"`
+	ItemCount  int    `json:"item_count"`
+	TotalCount int    `json:"total_count"`
+	Cursor     cursor `json:"cursor"`
+}
+
+type sortOptions struct {
+	Keys   []string `json:"sort_keys,omitempty"`
+	Orders []string `json:"sort_orders,omitempty"`
+}
+
+type sortParam struct {
+	Key   string `json:"sort_key,omitempty"`
+	Order string `json:"sort_order,omitempty"`
+}
+
+type sorting struct {
+	Available sortOptions `json:"available,omitempty"`
+	Current   []sortParam `json:"current,omitempty"`
+}
+
+// defRespVersions is the decoded JSON response body for fetching a list of definition versions
+type defRespListVersions struct {
+	Pagination pagination          `json:"pagination,omitempty"`
+	Sorting    sorting             `json:"sorting,omitempty"`
+	Filters    interface{}         `json:"filters,omitempty"`
+	TotalCount int                 `json:"total_count,omitempty"`
+	Versions   []DefinitionVersion `json:"versions,omitempty"`
+}
+
+type defRespGetVersion struct {
+	Version DefinitionVersion `json:"version,omitempty"`
 }
