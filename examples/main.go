@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	log "github.com/sirupsen/logrus"
 
 	"github.com/jjttech/cloudzero-client-go/cloudzero"
@@ -17,13 +19,13 @@ func main() {
 	}
 
 	// Load from the default filename "definition.yaml" in the current directory
-	def, err := cz.CostFormation.Read(cloudzero.DefaultDefinitionFilename)
+	def, err := cz.CostFormation.ReadFile(cloudzero.DefaultDefinitionFilename)
 	if err != nil {
 		log.WithError(err).Fatal("unable to load file")
 	}
 
 	// Print to the screen
-	if err = cz.CostFormation.Write(def, ""); err != nil {
+	if err = cz.CostFormation.Write(def, os.Stdout); err != nil {
 		log.WithError(err).Fatal("unable to write file")
 	}
 }

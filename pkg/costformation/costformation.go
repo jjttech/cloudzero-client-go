@@ -37,8 +37,18 @@ func New(cfg config.Config) (*CostFormation, error) {
 func (c *CostFormation) ReadFile(filename string) (*Definition, error) {
 	ret := Definition{}
 
-	err := ret.ReadFile(filename)
-	if err != nil {
+	if err := ret.ReadFile(filename); err != nil {
+		return nil, err
+	}
+
+	return &ret, nil
+}
+
+// Read is a wrapper for reading a definition from an io.Reader
+func (c *CostFormation) Read(input io.Reader) (*Definition, error) {
+	ret := Definition{}
+
+	if err := ret.Read(input); err != nil {
 		return nil, err
 	}
 
@@ -53,6 +63,15 @@ func (c *CostFormation) WriteFile(d *Definition, filename string) error {
 	}
 
 	return d.WriteFile(filename)
+}
+
+// Write is a wrapper for writing out the definition to an io.Writer
+func (c *CostFormation) Write(d *Definition, output io.Writer) error {
+	if nil == d {
+		return ErrInvalidDefinition
+	}
+
+	return d.Write(output)
 }
 
 // DefinitionList returns a list of definition files
