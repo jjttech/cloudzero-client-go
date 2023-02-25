@@ -3,6 +3,7 @@ package cloudzero
 import (
 	"errors"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/jjttech/cloudzero-client-go/pkg/config"
@@ -19,8 +20,12 @@ func WithAPIKey(apiKey string) ConfigOption {
 }
 
 // WithHTTPTimeout sets the timeout for HTTP requests.
-func ConfigHTTPTimeout(t time.Duration) ConfigOption {
+func WithHTTPTimeout(t time.Duration) ConfigOption {
 	return func(cfg *config.Config) error {
+		if t < 0 {
+			return errors.New("invalid HTTP Timeout")
+		}
+
 		var timeout = &t
 		cfg.Timeout = timeout
 		return nil
@@ -30,47 +35,51 @@ func ConfigHTTPTimeout(t time.Duration) ConfigOption {
 // WithHTTPTransport sets the HTTP Transporter.
 func WithHTTPTransport(transport http.RoundTripper) ConfigOption {
 	return func(cfg *config.Config) error {
-		if transport != nil {
-			cfg.HTTPTransport = transport
-			return nil
+		if nil == transport {
+			return errors.New("HTTP Transport can not be nil")
 		}
 
-		return errors.New("HTTP Transport can not be nil")
+		cfg.HTTPTransport = transport
+		return nil
 	}
 }
 
 // WithUserAgent sets the HTTP UserAgent for API requests.
 func WithUserAgent(ua string) ConfigOption {
 	return func(cfg *config.Config) error {
-		if ua != "" {
-			cfg.UserAgent = ua
-			return nil
+		if "" == ua {
+			return errors.New("user-agent can not be empty")
 		}
 
-		return errors.New("user-agent can not be empty")
+		cfg.UserAgent = ua
+		return nil
 	}
 }
 
 // WithBaseURL sets the base URL used to make requests to the REST API V2.
 func WithBaseURL(url string) ConfigOption {
 	return func(cfg *config.Config) error {
-		if url != "" {
-			cfg.BaseURL = url
-			return nil
+		if "" == url {
+			return errors.New("base URL can not be empty")
 		}
 
-		return errors.New("base URL can not be empty")
+		cfg.BaseURL = url
+		return nil
 	}
 }
 
 // WithLogLevel sets the log level for the client.
 func WithLogLevel(logLevel string) ConfigOption {
 	return func(cfg *config.Config) error {
-		if logLevel != "" {
-			cfg.LogLevel = logLevel
-			return nil
+		llv := strings.ToLower(logLevel)
+
+		switch llv {
+		case "panic", "fatal", "error", "warn", "warning", "info", "debug", "trace":
+			cfg.LogLevel = llv
+		default:
+			return errors.New("invalid log level")
 		}
 
-		return errors.New("log level can not be empty")
+		return nil
 	}
 }

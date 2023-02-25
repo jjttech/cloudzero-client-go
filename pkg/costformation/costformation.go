@@ -33,26 +33,45 @@ func New(cfg config.Config) (*CostFormation, error) {
 	}, nil
 }
 
-// DefinitionFromFile is a wrapper for reading a yaml definition file
-func (c *CostFormation) Read(filename string) (*DefinitionFile, error) {
-	ret := DefinitionFile{}
+// ReadFile is a wrapper for reading a yaml definition file
+func (c *CostFormation) ReadFile(filename string) (*Definition, error) {
+	ret := Definition{}
 
-	err := ret.Read(filename)
-	if err != nil {
+	if err := ret.ReadFile(filename); err != nil {
 		return nil, err
 	}
 
 	return &ret, nil
 }
 
-// DefinitionToFile is a wrapper for outputing the definition file content to a file (or stdout
+// Read is a wrapper for reading a definition from an io.Reader
+func (c *CostFormation) Read(input io.Reader) (*Definition, error) {
+	ret := Definition{}
+
+	if err := ret.Read(input); err != nil {
+		return nil, err
+	}
+
+	return &ret, nil
+}
+
+// WriteFile is a wrapper for outputing the definition file content to a file (or stdout
 // if filename is ""
-func (c *CostFormation) Write(d *DefinitionFile, filename string) error {
+func (c *CostFormation) WriteFile(d *Definition, filename string) error {
 	if nil == d {
 		return ErrInvalidDefinition
 	}
 
-	return d.Write(filename)
+	return d.WriteFile(filename)
+}
+
+// Write is a wrapper for writing out the definition to an io.Writer
+func (c *CostFormation) Write(d *Definition, output io.Writer) error {
+	if nil == d {
+		return ErrInvalidDefinition
+	}
+
+	return d.Write(output)
 }
 
 // DefinitionList returns a list of definition files
@@ -79,7 +98,7 @@ func (c *CostFormation) DefinitionVersions(ctx context.Context) ([]DefinitionVer
 }
 
 // DefintionFetch returns a specific version file
-func (c *CostFormation) DefinitionFetch(ctx context.Context, version string) (*DefinitionFile, error) {
+func (c *CostFormation) DefinitionFetch(ctx context.Context, version string) (*Definition, error) {
 	if "" == version {
 		version = "latest"
 	}
@@ -104,7 +123,7 @@ func (c *CostFormation) DefinitionFetch(ctx context.Context, version string) (*D
 
 	// TODO: We have to fetch the actual file from S3 as well...
 
-	ret := DefinitionFile{
+	ret := Definition{
 		LastUpdated:   data.Version.LastUpdated,
 		LastUpdatedBy: data.Version.LastUpdatedBy,
 		Version:       data.Version.Version,

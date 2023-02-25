@@ -4,8 +4,8 @@ import (
 	"github.com/jjttech/cloudzero-client-go/pkg/utils"
 )
 
-// DefinitionFile represents the yaml config file uploaded to CloudZero
-type DefinitionFile struct {
+// Definition represents the yaml config file uploaded to CloudZero
+type Definition struct {
 	Dimensions map[string]Dimension `yaml:"Dimensions,omitempty"`
 
 	// Attributes of the file, not content, explicitly ignore on yaml rendering

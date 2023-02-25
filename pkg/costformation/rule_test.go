@@ -47,4 +47,26 @@ var _ = Describe("Rule", func() {
 		})
 	})
 
+	Describe("MarshalYAML", func() {
+		It("should not error on an empty rule", func() {
+			r := Rule{}
+
+			y, err := r.MarshalYAML()
+			Expect(err).To(Succeed())
+			Expect(y).NotTo(BeNil())
+		})
+
+		It("should include a head comment", func() {
+			r := Rule{
+				HeadComment: "comment",
+			}
+
+			a, err := r.MarshalYAML()
+			Expect(err).To(Succeed())
+			Expect(a).NotTo(BeNil())
+
+			y := a.(yaml.Node)
+			Expect(y.HeadComment).To(Equal("comment"))
+		})
+	})
 })
