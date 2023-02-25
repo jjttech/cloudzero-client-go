@@ -6,7 +6,8 @@ import (
 )
 
 const (
-	DefaultBaseURL = "https://api.cloudzero.com/v2"
+	DefaultBaseURL  = "https://api.cloudzero.com/v2"
+	DefaultLogLevel = "info"
 )
 
 // Config contains information required when talking to the CloudZero API
@@ -38,6 +39,6 @@ type Config struct {
 func New() Config {
 	return Config{
 		BaseURL:  DefaultBaseURL,
-		LogLevel: "info",
+		LogLevel: DefaultLogLevel,
 	}
 }
