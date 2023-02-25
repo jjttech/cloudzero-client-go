@@ -1,11 +1,6 @@
 {
   "extends": ["config:base"],
   "gomodTidy": true,
-  "ignoreDeps": [
-    "golang.org/x/crypto",
-    "golang.org/x/net",
-    "golang.org/x/sys"
-  ],
   "commitMessagePrefix": "chore(deps):",
   "labels": ["dependencies"],
   "prConcurrentLimit": 4,
