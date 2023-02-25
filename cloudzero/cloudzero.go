@@ -5,13 +5,6 @@ import (
 	"github.com/jjttech/cloudzero-client-go/pkg/costformation"
 )
 
-// CloudZero client connection
-type CloudZero struct {
-	CostFormation *costformation.CostFormation
-
-	config config.Config
-}
-
 // New returns an initialized CloudZero client
 func New(opts ...ConfigOption) (*CloudZero, error) {
 	var err error

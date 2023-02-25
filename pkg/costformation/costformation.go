@@ -33,6 +33,28 @@ func New(cfg config.Config) (*CostFormation, error) {
 	}, nil
 }
 
+// DefinitionFromFile is a wrapper for reading a yaml definition file
+func (c *CostFormation) Read(filename string) (*DefinitionFile, error) {
+	ret := DefinitionFile{}
+
+	err := ret.Read(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ret, nil
+}
+
+// DefinitionToFile is a wrapper for outputing the definition file content to a file (or stdout
+// if filename is ""
+func (c *CostFormation) Write(d *DefinitionFile, filename string) error {
+	if nil == d {
+		return ErrInvalidDefinition
+	}
+
+	return d.Write(filename)
+}
+
 // DefinitionList returns a list of definition files
 func (c *CostFormation) DefinitionVersions(ctx context.Context) ([]DefinitionVersion, error) {
 	resp, err := c.client.Get(ctx, c.baseURL+DefinitionPath)
