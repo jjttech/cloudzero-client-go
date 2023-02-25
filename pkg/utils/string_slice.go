@@ -32,6 +32,10 @@ func (s *StringSlice) Equals(a *StringSlice) bool {
 // string or a slice of strings. Does not matter what the actual value type of the item
 // contained is (int/bool/etc), it's converted to a string. Uses YAML v3
 func (s *StringSlice) UnmarshalYAML(value *yaml.Node) error {
+	if nil == value {
+		return nil
+	}
+
 	var iface interface{}
 	if err := value.Decode(&iface); err != nil {
 		return err
