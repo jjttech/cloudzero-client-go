@@ -32,12 +32,12 @@ var cmdCostFormationFormat = &cobra.Command{
 		}
 
 		log.WithField("filename", formatFilename).Debug("loading CostFormation definition")
-		def, err := cz.CostFormation.Read(formatFilename)
+		def, err := cz.CostFormation.ReadFile(formatFilename)
 		if err != nil {
 			log.WithError(err).WithField("filename", formatFilename).Fatal("unable to load file")
 		}
 
-		if err = cz.CostFormation.Write(def, formatFilename); err != nil {
+		if err = cz.CostFormation.WriteFile(def, formatFilename); err != nil {
 			log.WithError(err).WithField("filename", formatFilename).Fatal("unable to write file")
 		}
 	},

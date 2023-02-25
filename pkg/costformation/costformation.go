@@ -33,11 +33,11 @@ func New(cfg config.Config) (*CostFormation, error) {
 	}, nil
 }
 
-// DefinitionFromFile is a wrapper for reading a yaml definition file
-func (c *CostFormation) Read(filename string) (*DefinitionFile, error) {
+// ReadFile is a wrapper for reading a yaml definition file
+func (c *CostFormation) ReadFile(filename string) (*DefinitionFile, error) {
 	ret := DefinitionFile{}
 
-	err := ret.Read(filename)
+	err := ret.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -45,14 +45,14 @@ func (c *CostFormation) Read(filename string) (*DefinitionFile, error) {
 	return &ret, nil
 }
 
-// DefinitionToFile is a wrapper for outputing the definition file content to a file (or stdout
+// WriteFile is a wrapper for outputing the definition file content to a file (or stdout
 // if filename is ""
-func (c *CostFormation) Write(d *DefinitionFile, filename string) error {
+func (c *CostFormation) WriteFile(d *DefinitionFile, filename string) error {
 	if nil == d {
 		return ErrInvalidDefinition
 	}
 
-	return d.Write(filename)
+	return d.WriteFile(filename)
 }
 
 // DefinitionList returns a list of definition files

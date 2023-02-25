@@ -9,31 +9,48 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// Read a DefintionFile from disk
-func (d *DefinitionFile) Read(filename string) error {
+// ReadFile loads a DefinitionFile from the specified file.
+func (d *DefinitionFile) ReadFile(filename string) error {
+	if nil == d {
+		return ErrInvalidDefinition
+	}
+
 	yfile, err := os.Open(filename)
 	if err != nil {
 		return err
 	}
 
-	decoder := yaml.NewDecoder(yfile)
+	return d.Read(yfile)
+}
+
+// Read a DefintionFile from an io.Reader
+func (d *DefinitionFile) Read(input io.Reader) error {
+	if nil == d {
+		return ErrInvalidDefinition
+	}
+
+	if nil == input {
+		return ErrInvalidReader
+	}
+
+	decoder := yaml.NewDecoder(input)
 	decoder.KnownFields(true) // Error on unknown fields, should make this configurable
 
 	var node yaml.Node
-	if err = decoder.Decode(&node); err != nil {
+	if err := decoder.Decode(&node); err != nil {
 		return err
 	}
 
 	return node.Decode(&d)
 }
 
-// Write a DefintionFile out. If filename is "" then output to stdout, otherwise write to the file
-func (d *DefinitionFile) Write(filename string) error {
-	var output io.Writer
-
+// WriteFile outputs a DefintionFile. If filename is "" then output to stdout, otherwise write to the file
+func (d *DefinitionFile) WriteFile(filename string) error {
 	if nil == d {
 		return ErrInvalidDefinition
 	}
+
+	var output io.Writer
 
 	if "" != filename {
 		fh, err := os.Create(filename)
@@ -48,6 +65,19 @@ func (d *DefinitionFile) Write(filename string) error {
 		output = w
 	} else {
 		output = os.Stdout
+	}
+
+	return d.Write(output)
+}
+
+// Write the DefintionFile to the specified output.
+func (d *DefinitionFile) Write(output io.Writer) error {
+	if nil == d {
+		return ErrInvalidDefinition
+	}
+
+	if nil == output {
+		return ErrInvalidWriter
 	}
 
 	if d.HeadComment != "" {
