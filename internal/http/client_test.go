@@ -3,12 +3,14 @@
 package http
 
 import (
+	"context"
 	"net/http"
 	"time"
 
 	retryablehttp "github.com/hashicorp/go-retryablehttp"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/ghttp"
 
 	"github.com/jjttech/cloudzero-client-go/pkg/config"
 )
@@ -149,6 +151,86 @@ var _ = Describe("Client", func() {
 
 			h := req.Header.Get("User-Agent")
 			Expect(h).To(Equal("test-user-agent"))
+		})
+	})
+
+	Describe("Client Actions", func() {
+		var server *ghttp.Server
+
+		BeforeEach(func() {
+			server = ghttp.NewServer()
+		})
+
+		AfterEach(func() {
+			server.Close()
+		})
+
+		Describe("Get", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					ghttp.VerifyRequest("GET", "/"),
+				)
+			})
+
+			It("should make a basic GET request", func() {
+				ctx := context.TODO()
+				client, _ := NewClient(config.Config{})
+
+				resp, err := client.Get(ctx, server.URL())
+				Expect(err).To(Succeed())
+				Expect(resp).NotTo(BeNil())
+			})
+		})
+
+		Describe("Post", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					ghttp.VerifyRequest("POST", "/"),
+				)
+			})
+
+			It("should make a basic POST request", func() {
+				ctx := context.TODO()
+				client, _ := NewClient(config.Config{})
+
+				resp, err := client.Post(ctx, server.URL(), nil)
+				Expect(err).To(Succeed())
+				Expect(resp).NotTo(BeNil())
+			})
+		})
+
+		Describe("Put", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					ghttp.VerifyRequest("PUT", "/"),
+				)
+			})
+
+			It("should make a basic PUT request", func() {
+				ctx := context.TODO()
+				client, _ := NewClient(config.Config{})
+
+				resp, err := client.Put(ctx, server.URL(), nil)
+				Expect(err).To(Succeed())
+				Expect(resp).NotTo(BeNil())
+			})
+		})
+
+		Describe("Delete", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					ghttp.VerifyRequest("DELETE", "/"),
+				)
+			})
+
+			It("should make a basic DELETE request", func() {
+				ctx := context.TODO()
+				client, _ := NewClient(config.Config{})
+
+				resp, err := client.Delete(ctx, server.URL())
+				Expect(err).To(Succeed())
+				Expect(resp).NotTo(BeNil())
+			})
 		})
 	})
 })
