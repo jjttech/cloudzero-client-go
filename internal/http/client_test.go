@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	retryablehttp "github.com/hashicorp/go-retryablehttp"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -97,6 +98,57 @@ var _ = Describe("Client", func() {
 			Expect(client).NotTo(BeNil())
 
 			Expect(client.apiKey).To(Equal("test-api-key"))
+		})
+	})
+
+	Describe("setHeaders", func() {
+		It("sets default headers only", func() {
+			client := Client{}
+			req, err := retryablehttp.NewRequest(http.MethodGet, "http://localhost", nil)
+			Expect(err).To(Succeed())
+
+			err = client.setHeaders(req)
+			Expect(err).To(Succeed())
+
+			// Unset
+			h := req.Header.Get("Authorization")
+			Expect(h).To(Equal(""))
+
+			// Default user agent
+			h = req.Header.Get("User-Agent")
+			Expect(h).To(Equal(defaultUserAgent))
+
+			// JSON
+			h = req.Header.Get("Content-Type")
+			Expect(h).To(Equal("application/json"))
+		})
+
+		It("sets the Authorization header", func() {
+			client := Client{
+				apiKey: "test-api-key",
+			}
+			req, err := retryablehttp.NewRequest(http.MethodGet, "http://localhost", nil)
+			Expect(err).To(Succeed())
+
+			err = client.setHeaders(req)
+			Expect(err).To(Succeed())
+
+			h := req.Header.Get("Authorization")
+			Expect(h).To(Equal("test-api-key"))
+		})
+
+		It("sets the User-Agent header", func() {
+			client := Client{
+				userAgent: "test-user-agent",
+			}
+			req, err := retryablehttp.NewRequest(http.MethodGet, "http://localhost", nil)
+			Expect(err).To(Succeed())
+
+			err = client.setHeaders(req)
+			Expect(err).To(Succeed())
+
+			h := req.Header.Get("User-Agent")
+			Expect(h).To(Equal("test-user-agent"))
 		})
 	})
 })
