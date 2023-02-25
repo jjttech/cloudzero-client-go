@@ -1,7 +1,3 @@
-#
-# Default definitions from the CloudZero documentation
-#   https://docs.cloudzero.com/docs/default-dimension-definitions
-#
 Dimensions:
   Category:
     Name: Service Category
