@@ -77,7 +77,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Generate release notes for GoReleaser to add to the GitHub release description
-${CHANGELOG_CMD} -o ${RELEASE_NOTES_FILE} ${VER_NEXT} --sort semver
+${CHANGELOG_CMD} -o ${RELEASE_NOTES_FILE} v${VER_NEXT} --sort semver
 
 # Correct spelling mistakes in release notes
 ${SPELL_CMD} -source text -w ${RELEASE_NOTES_FILE}
