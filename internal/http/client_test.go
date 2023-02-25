@@ -122,7 +122,7 @@ var _ = Describe("Client", func() {
 
 			// JSON
 			h = req.Header.Get("Content-Type")
-			Expect(h).To(Equal("application/json"))
+			Expect(h).To(Equal(defaultContentType))
 		})
 
 		It("sets the Authorization header", func() {
@@ -159,6 +159,10 @@ var _ = Describe("Client", func() {
 
 		BeforeEach(func() {
 			server = ghttp.NewServer()
+			server.AppendHandlers(
+				ghttp.VerifyHeader(http.Header{"User-Agent": []string{defaultUserAgent}}),
+				ghttp.VerifyHeader(http.Header{"Content-Type": []string{defaultContentType}}),
+			)
 		})
 
 		AfterEach(func() {
@@ -179,6 +183,7 @@ var _ = Describe("Client", func() {
 				resp, err := client.Get(ctx, server.URL())
 				Expect(err).To(Succeed())
 				Expect(resp).NotTo(BeNil())
+				Expect(server.ReceivedRequests()).Should(HaveLen(1))
 			})
 		})
 
@@ -196,6 +201,7 @@ var _ = Describe("Client", func() {
 				resp, err := client.Post(ctx, server.URL(), nil)
 				Expect(err).To(Succeed())
 				Expect(resp).NotTo(BeNil())
+				Expect(server.ReceivedRequests()).Should(HaveLen(1))
 			})
 		})
 
@@ -213,6 +219,7 @@ var _ = Describe("Client", func() {
 				resp, err := client.Put(ctx, server.URL(), nil)
 				Expect(err).To(Succeed())
 				Expect(resp).NotTo(BeNil())
+				Expect(server.ReceivedRequests()).Should(HaveLen(1))
 			})
 		})
 
@@ -230,6 +237,7 @@ var _ = Describe("Client", func() {
 				resp, err := client.Delete(ctx, server.URL())
 				Expect(err).To(Succeed())
 				Expect(resp).NotTo(BeNil())
+				Expect(server.ReceivedRequests()).Should(HaveLen(1))
 			})
 		})
 	})

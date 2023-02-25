@@ -21,6 +21,7 @@ const (
 	defaultRetryMax    = 3
 	defaultServiceName = "cloudzero-client-go"
 	defaultTimeout     = time.Second * 30
+	defaultContentType = "application/json"
 )
 
 var (
@@ -85,7 +86,7 @@ func (c *Client) setHeaders(req *retryablehttp.Request) error {
 		req.Header.Set("User-Agent", defaultUserAgent)
 	}
 
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Content-Type", defaultContentType)
 
 	return nil
 }
