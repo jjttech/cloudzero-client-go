@@ -15,6 +15,3 @@ release:
   prerelease: true
   name_template: "{{.ProjectName}} v{{.Version}}"
 
-# Already using git-chglog
-changelog:
-  skip: true
