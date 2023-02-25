@@ -34,8 +34,8 @@ func New(cfg config.Config) (*CostFormation, error) {
 }
 
 // ReadFile is a wrapper for reading a yaml definition file
-func (c *CostFormation) ReadFile(filename string) (*DefinitionFile, error) {
-	ret := DefinitionFile{}
+func (c *CostFormation) ReadFile(filename string) (*Definition, error) {
+	ret := Definition{}
 
 	err := ret.ReadFile(filename)
 	if err != nil {
@@ -47,7 +47,7 @@ func (c *CostFormation) ReadFile(filename string) (*DefinitionFile, error) {
 
 // WriteFile is a wrapper for outputing the definition file content to a file (or stdout
 // if filename is ""
-func (c *CostFormation) WriteFile(d *DefinitionFile, filename string) error {
+func (c *CostFormation) WriteFile(d *Definition, filename string) error {
 	if nil == d {
 		return ErrInvalidDefinition
 	}
@@ -79,7 +79,7 @@ func (c *CostFormation) DefinitionVersions(ctx context.Context) ([]DefinitionVer
 }
 
 // DefintionFetch returns a specific version file
-func (c *CostFormation) DefinitionFetch(ctx context.Context, version string) (*DefinitionFile, error) {
+func (c *CostFormation) DefinitionFetch(ctx context.Context, version string) (*Definition, error) {
 	if "" == version {
 		version = "latest"
 	}
@@ -104,7 +104,7 @@ func (c *CostFormation) DefinitionFetch(ctx context.Context, version string) (*D
 
 	// TODO: We have to fetch the actual file from S3 as well...
 
-	ret := DefinitionFile{
+	ret := Definition{
 		LastUpdated:   data.Version.LastUpdated,
 		LastUpdatedBy: data.Version.LastUpdatedBy,
 		Version:       data.Version.Version,

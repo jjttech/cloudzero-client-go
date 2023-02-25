@@ -9,8 +9,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// ReadFile loads a DefinitionFile from the specified file.
-func (d *DefinitionFile) ReadFile(filename string) error {
+// ReadFile loads a Definition from the specified file.
+func (d *Definition) ReadFile(filename string) error {
 	if nil == d {
 		return ErrInvalidDefinition
 	}
@@ -23,8 +23,8 @@ func (d *DefinitionFile) ReadFile(filename string) error {
 	return d.Read(yfile)
 }
 
-// Read a DefintionFile from an io.Reader
-func (d *DefinitionFile) Read(input io.Reader) error {
+// Read a Definition from an io.Reader
+func (d *Definition) Read(input io.Reader) error {
 	if nil == d {
 		return ErrInvalidDefinition
 	}
@@ -44,8 +44,8 @@ func (d *DefinitionFile) Read(input io.Reader) error {
 	return node.Decode(&d)
 }
 
-// WriteFile outputs a DefintionFile. If filename is "" then output to stdout, otherwise write to the file
-func (d *DefinitionFile) WriteFile(filename string) error {
+// WriteFile outputs a Definition. If filename is "" then output to stdout, otherwise write to the file
+func (d *Definition) WriteFile(filename string) error {
 	if nil == d {
 		return ErrInvalidDefinition
 	}
@@ -70,8 +70,8 @@ func (d *DefinitionFile) WriteFile(filename string) error {
 	return d.Write(output)
 }
 
-// Write the DefintionFile to the specified output.
-func (d *DefinitionFile) Write(output io.Writer) error {
+// Write the Definition to the specified output.
+func (d *Definition) Write(output io.Writer) error {
 	if nil == d {
 		return ErrInvalidDefinition
 	}
