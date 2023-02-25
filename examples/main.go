@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/jjttech/cloudzero-client-go/cloudzero"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/jjttech/cloudzero-client-go/cloudzero"
 )
 
 func main() {
