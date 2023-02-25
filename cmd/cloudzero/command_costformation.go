@@ -26,10 +26,12 @@ var cmdCostFormationFormat = &cobra.Command{
 			err error
 		)
 
+		log.Debug("creating CloudZero client")
 		if cz, err = cloudzero.New(); err != nil {
 			log.WithError(err).Fatal("unable to create CloudZero client")
 		}
 
+		log.WithField("filename", formatFilename).Debug("loading CostFormation definition")
 		def, err := cz.CostFormation.Read(formatFilename)
 		if err != nil {
 			log.WithError(err).WithField("filename", formatFilename).Fatal("unable to load file")

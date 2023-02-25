@@ -1,9 +1,9 @@
 package main
 
 import (
-	"log"
 	"strings"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	flag "github.com/spf13/pflag"
 
@@ -25,6 +25,15 @@ var rootCmd = &cobra.Command{
 	Long:              AppDescription,
 	Version:           version.Version,
 	DisableAutoGenTag: true,
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		// Set the log level accordingly
+		llv, err := log.ParseLevel(logLevel)
+		if err != nil {
+			log.WithError(err).Fatal("unsupported log level")
+		}
+		log.SetLevel(llv)
+
+	},
 }
 
 func main() {
