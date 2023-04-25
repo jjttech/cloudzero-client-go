@@ -3,9 +3,11 @@ package costformation
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
+	"net/http"
 
-	"github.com/jjttech/cloudzero-client-go/internal/http"
+	czhttp "github.com/jjttech/cloudzero-client-go/internal/http"
 	"github.com/jjttech/cloudzero-client-go/pkg/config"
 )
 
@@ -16,13 +18,13 @@ const (
 
 // CostFormation API Client
 type CostFormation struct {
-	client  *http.Client
+	client  *czhttp.Client
 	baseURL string
 }
 
 // New returns a new instance of the CostFormation API client
 func New(cfg config.Config) (*CostFormation, error) {
-	client, err := http.NewClient(cfg)
+	client, err := czhttp.NewClient(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +76,7 @@ func (c *CostFormation) Write(d *Definition, output io.Writer) error {
 	return d.Write(output)
 }
 
-// DefinitionList returns a list of definition files
+// DefinitionVersions returns a list of definition files
 func (c *CostFormation) DefinitionVersions(ctx context.Context) ([]DefinitionVersion, error) {
 	resp, err := c.client.Get(ctx, c.baseURL+DefinitionPath)
 	if err != nil {
@@ -121,13 +123,27 @@ func (c *CostFormation) DefinitionFetch(ctx context.Context, version string) (*D
 		return nil, err
 	}
 
-	// TODO: We have to fetch the actual file from S3 as well...
-
-	ret := Definition{
-		LastUpdated:   data.Version.LastUpdated,
-		LastUpdatedBy: data.Version.LastUpdatedBy,
-		Version:       data.Version.Version,
+	// We get a URI back, so make another fetch and pass it to the reader
+	if "" == data.Version.URI {
+		return nil, fmt.Errorf("failed to fetch definition version: %s", version)
 	}
+
+	// Use raw HTTP client here, as the URI contains all info needed for the fetch (from S3)
+	dResp, dErr := http.Get(data.Version.URI)
+	if dErr != nil {
+		return nil, err
+	}
+	defer dResp.Body.Close()
+
+	ret := Definition{}
+
+	if err = ret.Read(dResp.Body); err != nil {
+		return nil, err
+	}
+
+	ret.LastUpdated = data.Version.LastUpdated
+	ret.LastUpdatedBy = data.Version.LastUpdatedBy
+	ret.Version = data.Version.Version
 
 	return &ret, nil
 }

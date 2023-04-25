@@ -21,6 +21,7 @@ const (
 	defaultRetryMax    = 3
 	defaultServiceName = "cloudzero-client-go"
 	defaultTimeout     = time.Second * 30
+	defaultContentType = "application/json"
 )
 
 var (
@@ -73,6 +74,7 @@ func NewClient(cfg config.Config) (*Client, error) {
 	return client, nil
 }
 
+// setHeaders applies the default headers needed to talk to the API endpoint
 func (c *Client) setHeaders(req *retryablehttp.Request) error {
 	if "" != c.apiKey {
 		req.Header.Set("Authorization", c.apiKey)
@@ -84,7 +86,7 @@ func (c *Client) setHeaders(req *retryablehttp.Request) error {
 		req.Header.Set("User-Agent", defaultUserAgent)
 	}
 
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Content-Type", defaultContentType)
 
 	return nil
 }
