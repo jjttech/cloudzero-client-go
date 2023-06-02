@@ -3,6 +3,7 @@ package cloudzero
 import (
 	"github.com/jjttech/cloudzero-client-go/pkg/config"
 	"github.com/jjttech/cloudzero-client-go/pkg/costformation"
+	"github.com/jjttech/cloudzero-client-go/pkg/telemetry"
 )
 
 // New returns an initialized CloudZero client
@@ -24,6 +25,10 @@ func New(opts ...ConfigOption) (*CloudZero, error) {
 	}
 
 	if client.CostFormation, err = costformation.New(client.config); err != nil {
+		return nil, err
+	}
+
+	if client.Telemetry, err = telemetry.New(client.config); err != nil {
 		return nil, err
 	}
 
